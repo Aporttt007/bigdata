@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17+9+
+    container_name: aliexpress_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: aliexpress_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  django:
+    build: ./django_app
+    container_name: aliexpress_django
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_DB=aliexpress_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DEBUG=True
+      - SECRET_KEY=supersecretkey
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./django_app:/app
+
+volumes:
+  postgres_data:
